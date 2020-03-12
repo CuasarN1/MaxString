@@ -1,27 +1,42 @@
 #pragma once
 #include <vector>
-#include <list>
+#include <set>
 #include <map>
 #include <iostream>
 #include <string>
 
 using namespace std;
 
-class A
+class triple
 {
 public:
-	A(list <string> s, map <char, int> a, vector <pair <pair <string, char>, string>> dt, list <string> ins, list <string> outs); //конструктор автомата
+	triple(string in, char a, string out);
+	triple();
+	string getIN();
+	string getOUT();
+	char getA();;
+	void setIN(string in);
+	void setA(char a);
+	void setOUT(string out);
+private:
+	string input;
+	char letter;
+	string output;
+};
+
+class Machine
+{
+public:
+	Machine(set <string> s, set <char> a, vector <triple> dt, set <string> ins, set <string> outs); //конструктор автомата
 	pair <bool, int> maxString(string str, int k); //maxString
-	list <string> shift(list <string> state, char letter); //смена состояний
-	bool finish(list <string> c); //проверка на заключительное состояние
+	set <string> transition(set <string> state, char letter); //смена состояний
+	bool finish(set <string> c); //проверка на заключительное состояние
 	void sub(string str, int k); //вывод всех слов в строке
 
 private:
-	string subword;
-	map <char, int> alphabeth;
-	map <char, int>::iterator it;
+	set <char> alphabeth;
 	pair <bool, int> resm;
-	list <string> States;
-	list <string> CurrentState, S, F;
-	vector <pair <pair <string, char>, string>> delta;
+	set <string> States;
+	set <string> CurrentState, S, F;
+	vector <triple> delta;
 };

@@ -1,29 +1,23 @@
 #include "machine.h"
 
-A::A(list <string> s, map <char, int> a, vector <pair <pair <string, char>, string>> dt, list <string> ins, list <string> outs)
+Machine::Machine(set <string> s, set <char> a, vector <triple> dt, set <string> ins, set <string> outs)
 {
-	//количество состояний
-	this->States = s;
-	//алфавит
-	this->alphabeth = a;
-	//функции перехода
-	this->delta = dt;
-	//начальные состояния
-	this->S = ins;
-	//заключительные состояния
-	this->F = outs;
+	States = s; //количество состояний
+	alphabeth = a; //алфавит
+	delta = dt; //функции перехода
+	S = ins; //начальные состояния
+	F = outs; //заключительные состояния
 	//выход
-	this->resm.first = false;
-	this->resm.second = 0;
-
+	resm.first = false;
+	resm.second = 0;
 }
 
-pair <bool, int> A::maxString(string str, int k)
+pair <bool, int> Machine::maxString(string str, int k)
 {
-	subword = "";
 	resm.first = false;
 	resm.second = 0;
 	CurrentState = S;
+	set <char>::iterator it;
 	if (str.length() == 0 && finish(CurrentState)) //если стартовое состояние - заключительное
 		resm.first = true;
 	else {
@@ -36,12 +30,11 @@ pair <bool, int> A::maxString(string str, int k)
 			else
 			{
 				buff += str[i];
-				CurrentState = shift(CurrentState, str[i]); //смена состояний
+				CurrentState = transition(CurrentState, str[i]); //смена состояний
 				if (finish(CurrentState)) //если среди текущих состояний есть заключительное
 				{
 					resm.first = true;
 					resm.second = buff.length();
-					subword = buff;
 				}
 			}
 		}
@@ -49,32 +42,31 @@ pair <bool, int> A::maxString(string str, int k)
 	return resm;
 }
 
-list <string> A::shift(list <string> state, char letter) //смена состояний
+set <string> Machine::transition(set <string> state, char letter) //смена состояний
 {
-	list <string> buff;
-	buff.clear();
+	set <string> buff;
 
-	for (list <string>::iterator j = state.begin(); j != state.end(); j++)
+	for (set <string>::iterator j = state.begin(); j != state.end(); j++)
 		for (int i = 0; i < delta.size(); i++)
-			if (delta[i].first.first == *j && delta[i].first.second == letter)
-				buff.push_back(delta[i].second);
+			if (delta[i].getIN() == *j && delta[i].getA() == letter)
+				buff.insert(delta[i].getOUT());
 
-	buff.sort();
-	buff.unique();
 	return buff;
 }
 
-bool A::finish(list <string> c) //проверка на заключительное состояние
+bool Machine::finish(set <string> c) //проверка на заключительное состояние
 {
-	for (list <string>::iterator i = F.begin(); i != F.end(); i++)
-		for (list <string>::iterator j = c.begin(); j != c.end(); j++)
-			if (*i == *j)
-				return true;
+	set <string>::iterator it;
+
+	for (set <string>::iterator i = F.begin(); i != F.end(); i++)
+		if (c.find(*i) != c.end())
+			return true;
+
 	return false;
 
 }
 
-void A::sub(string str, int k) //процедура вывода всех слов строки
+void Machine::sub(string str, int k) //процедура вывода всех слов строки
 {
 	int length = str.length();
 	bool flag = false;
@@ -86,11 +78,14 @@ void A::sub(string str, int k) //процедура вывода всех сло
 		result = maxString(str, k);
 		if (result.first)
 		{
-			cout << "true " << result.second << ' ' << subword << endl;
+			cout << "true " << k << ' ' << k + result.second - 1 << ' ';
+			for (int i = k; i < k + result.second; i++)
+				cout << str[i];
+			cout << endl;
 			flag = true;
 			k += result.second;
 		}
-		else
+		else 
 			k++;
 	}
 	if (!flag)

@@ -155,7 +155,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="machine.cpp" />
-    <ClCompile Include="maxSring.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="triple.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="automato.txt" />
